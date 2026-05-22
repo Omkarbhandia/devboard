@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth')
 const protect = require('./middleware/auth')
 const githubRoutes = require('./routes/github')
 const leetcodeRoutes = require('./routes/leetcode')
+const taskRoutes = require('./routes/tasks')
 
 
 const app = express()
@@ -22,6 +23,7 @@ app.use(cookieParser())
 app.use('/api/auth', authRoutes)
 app.use('/api/github', githubRoutes)
 app.use('/api/leetcode', leetcodeRoutes)
+app.use('/api/tasks', taskRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'DevBoard API is running' })
