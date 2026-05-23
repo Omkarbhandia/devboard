@@ -1,9 +1,8 @@
 'use client'
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContent'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useAuth } from '../context/AuthContent'
-
 
 export default function LoginPage() {
   const { login, loading, error, clearError } = useAuth()
@@ -23,29 +22,26 @@ export default function LoginPage() {
     e.preventDefault()
     const success = await login(formData.email, formData.password)
     if (success) router.push('/dashboard')
-}
+  }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-gray-900 rounded-2xl p-8 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <div className="w-full max-w-md rounded-2xl p-8 shadow-xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
 
-        {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-white">DevBoard</h1>
-          <p className="text-gray-400 mt-2">Welcome back</p>
+          <h1 className="text-3xl font-bold">DevBoard</h1>
+          <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Welcome back</p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Email</label>
+            <label className="text-sm mb-1 block" style={{ color: 'var(--text-secondary)' }}>Email</label>
             <input
               type="email"
               name="email"
@@ -53,12 +49,13 @@ export default function LoginPage() {
               onChange={handleChange}
               placeholder="omkar@gmail.com"
               required
-              className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600"
+              className="w-full rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
             />
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Password</label>
+            <label className="text-sm mb-1 block" style={{ color: 'var(--text-secondary)' }}>Password</label>
             <input
               type="password"
               name="password"
@@ -66,7 +63,8 @@ export default function LoginPage() {
               onChange={handleChange}
               placeholder="Your password"
               required
-              className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600"
+              className="w-full rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
             />
           </div>
 
@@ -79,8 +77,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Register Link */}
-        <p className="text-gray-500 text-sm text-center mt-6">
+        <p className="text-sm text-center mt-6" style={{ color: 'var(--text-tertiary)' }}>
           Don't have an account?{' '}
           <Link href="/register" className="text-blue-400 hover:text-blue-300">
             Create one

@@ -1,54 +1,50 @@
 'use client'
-
-import { useState } from "react"
-import { useAuth } from "../context/AuthContent"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
+import { useState } from 'react'
+import { useAuth } from '../context/AuthContent'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function RegisterPage() {
-    const { register, loading, error, clearError } = useAuth()
-    const router = useRouter()
+  const { register, loading, error, clearError } = useAuth()
+  const router = useRouter()
 
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        githubUsername: '',
-        leetcodeUsername: '',
-    })
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    githubUsername: '',
+    leetcodeUsername: '',
+  })
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        clearError()
-        setFormData({ ...formData, [e.target.name]: e.target.value })
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearError()
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        const success = await register(formData)
-        if (success) router.push('/dashboard')
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const success = await register(formData)
+    if (success) router.push('/dashboard')
+  }
 
-    return (
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-gray-900 rounded-2xl p-8 shadow-xl">
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <div className="w-full max-w-md rounded-2xl p-8 shadow-xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
 
-        {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-white">DevBoard</h1>
-          <p className="text-gray-400 mt-2">Create your developer dashboard</p>
+          <h1 className="text-3xl font-bold">DevBoard</h1>
+          <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Create your developer dashboard</p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Full Name</label>
+            <label className="text-sm mb-1 block" style={{ color: 'var(--text-secondary)' }}>Full Name</label>
             <input
               type="text"
               name="name"
@@ -56,12 +52,13 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Omkar Bhandia"
               required
-              className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600"
+              className="w-full rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
             />
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Email</label>
+            <label className="text-sm mb-1 block" style={{ color: 'var(--text-secondary)' }}>Email</label>
             <input
               type="email"
               name="email"
@@ -69,12 +66,13 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="omkar@gmail.com"
               required
-              className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600"
+              className="w-full rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
             />
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Password</label>
+            <label className="text-sm mb-1 block" style={{ color: 'var(--text-secondary)' }}>Password</label>
             <input
               type="password"
               name="password"
@@ -82,13 +80,14 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Min 6 characters"
               required
-              className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600"
+              className="w-full rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
             />
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">
-              GitHub Username <span className="text-gray-600">(optional)</span>
+            <label className="text-sm mb-1 block" style={{ color: 'var(--text-secondary)' }}>
+              GitHub Username <span style={{ color: 'var(--text-tertiary)' }}>(optional)</span>
             </label>
             <input
               type="text"
@@ -96,13 +95,14 @@ export default function RegisterPage() {
               value={formData.githubUsername}
               onChange={handleChange}
               placeholder="Omkarbhandia"
-              className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600"
+              className="w-full rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
             />
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">
-              LeetCode Username <span className="text-gray-600">(optional)</span>
+            <label className="text-sm mb-1 block" style={{ color: 'var(--text-secondary)' }}>
+              LeetCode Username <span style={{ color: 'var(--text-tertiary)' }}>(optional)</span>
             </label>
             <input
               type="text"
@@ -110,7 +110,8 @@ export default function RegisterPage() {
               value={formData.leetcodeUsername}
               onChange={handleChange}
               placeholder="omkar123"
-              className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600"
+              className="w-full rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
             />
           </div>
 
@@ -123,8 +124,7 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        {/* Login Link */}
-        <p className="text-gray-500 text-sm text-center mt-6">
+        <p className="text-sm text-center mt-6" style={{ color: 'var(--text-tertiary)' }}>
           Already have an account?{' '}
           <Link href="/login" className="text-blue-400 hover:text-blue-300">
             Sign in
@@ -133,5 +133,5 @@ export default function RegisterPage() {
 
       </div>
     </div>
-    )
-};
+  )
+}

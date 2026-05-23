@@ -8,6 +8,7 @@ const protect = require('./middleware/auth')
 const githubRoutes = require('./routes/github')
 const leetcodeRoutes = require('./routes/leetcode')
 const taskRoutes = require('./routes/tasks')
+const profileRoutes = require('./routes/profile') 
 
 
 const app = express()
@@ -24,6 +25,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/github', githubRoutes)
 app.use('/api/leetcode', leetcodeRoutes)
 app.use('/api/tasks', taskRoutes)
+app.use('/api/profile', profileRoutes)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'DevBoard API is running' })
