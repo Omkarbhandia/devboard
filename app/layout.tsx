@@ -6,6 +6,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'DevBoard',
   description: 'Your developer dashboard',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({

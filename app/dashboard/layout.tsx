@@ -50,7 +50,10 @@ export default function DashboardLayout({
           borderColor: "var(--border)",
         }}
       >
-        <h1 className="text-lg font-bold">DevBoard</h1>
+        <h1 className="text-xl font-bold font-mono">
+          <span className="text-blue-400">▶</span> DevBoard
+          <span className="animate-pulse text-blue-400">_</span>
+        </h1>
         <div className="flex items-center gap-1">
           {mounted && (
             <button
@@ -116,7 +119,7 @@ export default function DashboardLayout({
             >
               {user?.email}
             </p>
-            
+
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors text-red-400"
@@ -137,7 +140,12 @@ export default function DashboardLayout({
         }}
       >
         <div className="flex items-center justify-between mb-6">
-          {!collapsed && <h1 className="text-xl font-bold">DevBoard</h1>}
+          {!collapsed && (
+            <h1 className="text-lg font-bold font-mono">
+              <span className="text-blue-400">▶</span> DevBoard
+              <span className="animate-pulse text-blue-400">_</span>
+            </h1>
+          )}
           <div className="flex items-center gap-1 ml-auto">
             {mounted && (
               <button
