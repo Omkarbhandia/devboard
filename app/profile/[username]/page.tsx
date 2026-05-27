@@ -1,235 +1,209 @@
 'use client'
-import { useAuth } from '../../context/AuthContent'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react'
 import axios from 'axios'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-interface Task {
-  _id: string
-  title: string
-  priority: 'high' | 'medium' | 'low'
-  status: 'active' | 'completed'
-  createdAt: string
-}
-
-const PRIORITY_COLORS = {
-  high: { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20' },
-  medium: { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20' },
-  low: { bg: 'bg-gray-500/10', text: 'text-gray-400', border: 'border-gray-500/20' },
-}
-
-export default function TasksPage() {
-  const { isAuthenticated, initialLoading } = useAuth()
-  const router = useRouter()
-  const [tasks, setTasks] = useState<Task[]>([])
+export default function PublicProfilePage({
+  params,
+}: {
+  params: Promise<{ username: string }>
+}) {
+  const { username } = use(params)
+  const [profileData, setProfileData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [newTask, setNewTask] = useState('')
-  const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium')
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
-  const [adding, setAdding] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    if (!initialLoading && !isAuthenticated) {
-      router.push('/login')
-    }
-  }, [isAuthenticated, initialLoading])
+    fetchProfile()
+  }, [])
 
-  useEffect(() => {
-    if (!initialLoading && isAuthenticated) {
-      fetchTasks()
-    }
-  }, [initialLoading, isAuthenticated])
-
-  const fetchTasks = async () => {
+  const fetchProfile = async () => {
     try {
       setLoading(true)
-      const res = await axios.get(`${API_URL}/api/tasks`, { withCredentials: true })
-      setTasks(res.data)
-    } catch (err) {
-      console.error(err)
+      const res = await axios.get(`${API_URL}/api/profile/${username}`)
+      setProfileData(res.data)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Profile not found')
     } finally {
       setLoading(false)
     }
   }
 
-  const addTask = async () => {
-    if (!newTask.trim()) return
-    try {
-      setAdding(true)
-      const res = await axios.post(
-        `${API_URL}/api/tasks`,
-        { title: newTask, priority },
-        { withCredentials: true }
-      )
-      setTasks([res.data, ...tasks])
-      setNewTask('')
-      setPriority('medium')
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setAdding(false)
-    }
+  const handleCopy = () => {
+    navigator.clipboard.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
-  const toggleStatus = async (task: Task) => {
-    try {
-      const newStatus = task.status === 'active' ? 'completed' : 'active'
-      const res = await axios.patch(
-        `${API_URL}/api/tasks/${task._id}`,
-        { status: newStatus },
-        { withCredentials: true }
-      )
-      setTasks(tasks.map(t => t._id === task._id ? res.data : t))
-    } catch (err) {
-      console.error(err)
-    }
+  const LANGUAGE_COLORS: { [key: string]: string } = {
+    JavaScript: '#f1e05a',
+    TypeScript: '#3178c6',
+    Python: '#3572A5',
+    HTML: '#e34c26',
+    CSS: '#563d7c',
+    Java: '#b07219',
+    default: '#8b949e',
   }
 
-  const deleteTask = async (id: string) => {
-    try {
-      await axios.delete(`${API_URL}/api/tasks/${id}`, { withCredentials: true })
-      setTasks(tasks.filter(t => t._id !== id))
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const filteredTasks = tasks.filter(task => {
-    if (filter === 'all') return true
-    return task.status === filter
-  })
-
-  const activeTasks = tasks.filter(t => t.status === 'active').length
-  const completedTasks = tasks.filter(t => t.status === 'completed').length
-
-  if (initialLoading) return (
+  if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
+      <p style={{ color: 'var(--text-secondary)' }}>Loading profile...</p>
     </div>
   )
 
+  if (error) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <div className="text-center">
+        <p className="text-red-400 text-lg mb-2">Profile not found</p>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{error}</p>
+      </div>
+    </div>
+  )
+
+  if (!profileData) return null
+
+  const { user, github, leetcode } = profileData
+
   return (
-    <div className="p-8">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold">Tasks</h2>
-        <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>
-          {activeTasks} active · {completedTasks} completed
-        </p>
-      </div>
-
-      {/* Add Task */}
-      <div className="rounded-xl p-4 border mb-6 flex flex-col sm:flex-row gap-3" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-        <input
-          type="text"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && addTask()}
-          placeholder="Add a new task..."
-          className="flex-1 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-          style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)' }}
-        />
-        <div className="relative w-32">
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value as 'high' | 'medium' | 'low')}
-            className="w-full rounded-lg pl-3 pr-10 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer appearance-none border"
-            style={{ backgroundColor: 'var(--input-bg)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
-          >
-            <option value="high">🔴 High</option>
-            <option value="medium">🟡 Medium</option>
-            <option value="low">⚪ Low</option>
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3" style={{ color: 'var(--text-secondary)' }}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </div>
-        <button
-          onClick={addTask}
-          disabled={adding || !newTask.trim()}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
-        >
-          {adding ? 'Adding...' : '+ Add Task'}
-        </button>
-      </div>
-
-      {/* Filter tabs */}
-      <div className="flex gap-2 mb-4">
-        {(['all', 'active', 'completed'] as const).map((f) => (
+      <div className="border-b" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <h1 className="text-lg font-bold">DevBoard</h1>
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className="px-4 py-1.5 rounded-lg text-sm transition-colors capitalize"
-            style={{
-              backgroundColor: filter === f ? 'var(--hover-bg)' : 'transparent',
-              color: filter === f ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontWeight: filter === f ? '500' : '400',
-            }}
+            onClick={handleCopy}
+            className="px-4 py-2 rounded-lg text-sm transition-colors border"
+            style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
           >
-            {f}
+            {copied ? '✓ Copied!' : 'Copy Profile Link'}
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* Task List */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <p style={{ color: 'var(--text-secondary)' }}>Loading tasks...</p>
-        </div>
-      ) : filteredTasks.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-            {filter === 'all' ? 'No tasks yet — add one above!' : `No ${filter} tasks`}
-          </p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {filteredTasks.map((task) => (
-            <div
-              key={task._id}
-              className={`rounded-xl p-4 border flex items-center gap-4 transition-opacity ${task.status === 'completed' ? 'opacity-60' : ''}`}
-              style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}
-            >
-              <button
-                onClick={() => toggleStatus(task)}
-                className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
-                  task.status === 'completed'
-                    ? 'bg-green-500 border-green-500'
-                    : 'border-gray-600 hover:border-green-500'
-                }`}
-              >
-                {task.status === 'completed' && (
-                  <span className="text-white text-xs">✓</span>
+      <div className="max-w-4xl mx-auto px-6 py-8">
+
+        {github && (
+          <div className="rounded-xl p-6 border mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            <img src={github.profile.avatar} alt={github.profile.name} className="w-20 h-20 rounded-full flex-shrink-0" />
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold">{user.name}</h2>
+              <p style={{ color: 'var(--text-secondary)' }}>@{github.profile.username}</p>
+              <div className="flex gap-4 mt-3">
+                {user.githubUsername && (
+                  <a href={`https://github.com/${user.githubUsername}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300">
+                    🐙 GitHub
+                  </a>
                 )}
-              </button>
+                {user.leetcodeUsername && (
+                  <a href={`https://leetcode.com/${user.leetcodeUsername}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300">
+                    💻 LeetCode
+                  </a>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-6 text-center">
+              <div>
+                <p className="text-xl font-bold">{github.profile.followers}</p>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Followers</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold">{github.profile.publicRepos}</p>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Repos</p>
+              </div>
+            </div>
+          </div>
+        )}
 
-              <p className={`flex-1 text-sm ${task.status === 'completed' ? 'line-through' : ''}`}
-                style={{ color: task.status === 'completed' ? 'var(--text-tertiary)' : 'var(--text-primary)' }}
-              >
-                {task.title}
-              </p>
-
-              <span className={`text-xs px-2 py-1 rounded-full capitalize flex-shrink-0 border ${PRIORITY_COLORS[task.priority].bg} ${PRIORITY_COLORS[task.priority].text} ${PRIORITY_COLORS[task.priority].border}`}>
-                {task.priority}
-              </span>
-
-              <button
-                onClick={() => deleteTask(task._id)}
-                className="flex-shrink-0 text-sm transition-colors"
-                style={{ color: 'var(--text-tertiary)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-tertiary)')}
-              >
-                ✕
-              </button>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: 'Repos', value: github?.stats.totalRepos || 0 },
+            { label: 'Commits', value: github?.stats.recentCommits || 0 },
+            { label: 'LC Solved', value: leetcode?.stats.total || 0 },
+            { label: 'Streak 🔥', value: leetcode?.streak.current || 0 },
+          ].map((item) => (
+            <div key={item.label} className="rounded-xl p-4 border text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <p className="text-2xl font-bold">{item.value}</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>{item.label}</p>
             </div>
           ))}
         </div>
-      )}
+
+        {github && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="rounded-xl p-6 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <h3 className="text-sm font-medium mb-4" style={{ color: 'var(--text-secondary)' }}>Top Repositories</h3>
+              <div className="flex flex-col gap-3">
+                {github.topRepos.map((repo: any) => (
+                  <a key={repo.name} href={repo.url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-start justify-between gap-4 p-3 rounded-lg transition-colors"
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--hover-bg)')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-blue-400 truncate">{repo.name}</p>
+                      {repo.description && <p className="text-xs truncate mt-0.5" style={{ color: 'var(--text-tertiary)' }}>{repo.description}</p>}
+                      {repo.language && (
+                        <div className="flex items-center gap-1.5 mt-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: LANGUAGE_COLORS[repo.language] || LANGUAGE_COLORS.default }} />
+                          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{repo.language}</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs flex-shrink-0" style={{ color: 'var(--text-secondary)' }}>⭐ {repo.stars}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-xl p-6 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <h3 className="text-sm font-medium mb-4" style={{ color: 'var(--text-secondary)' }}>Top Languages</h3>
+              <div className="flex flex-col gap-4">
+                {github.topLanguages.map((item: any) => {
+                  const total = github.topLanguages.reduce((a: number, b: any) => a + b.count, 0)
+                  const percentage = Math.round((item.count / total) * 100)
+                  return (
+                    <div key={item.language}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: LANGUAGE_COLORS[item.language] || LANGUAGE_COLORS.default }} />
+                          <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{item.language}</span>
+                        </div>
+                        <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{percentage}%</span>
+                      </div>
+                      <div className="w-full rounded-full h-1.5" style={{ backgroundColor: 'var(--input-bg)' }}>
+                        <div className="h-1.5 rounded-full" style={{ width: `${percentage}%`, backgroundColor: LANGUAGE_COLORS[item.language] || LANGUAGE_COLORS.default }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {leetcode && (
+          <div className="rounded-xl p-6 border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            <h3 className="text-sm font-medium mb-4" style={{ color: 'var(--text-secondary)' }}>LeetCode Stats</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                <p className="text-2xl font-bold text-green-400">{leetcode.stats.easy}</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Easy</p>
+              </div>
+              <div className="text-center p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                <p className="text-2xl font-bold text-amber-400">{leetcode.stats.medium}</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Medium</p>
+              </div>
+              <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                <p className="text-2xl font-bold text-red-400">{leetcode.stats.hard}</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Hard</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   )
 }
