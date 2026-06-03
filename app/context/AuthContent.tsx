@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
     const res = await axios.patch(`${API_URL}/api/auth/name`, { name }, {
       withCredentials: true,
     })
-    setUser(res.data)
+    setUser( {...res.data})
     return true
   } catch (err: any) {
     setError(err.response?.data?.message || 'Update failed')
