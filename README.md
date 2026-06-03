@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ▶ DevBoard_
 
-## Getting Started
+A developer productivity dashboard to track your GitHub activity, LeetCode progress, and daily tasks — all in one place.
 
-First, run the development server:
+## 🔗 Live Demo
+[mydevboard.vercel.app](https://mydevboard.vercel.app)
+
+## 📸 Screenshots
+> ![Dashboard](image.png)
+> ![github](image-1.png)
+> ![public profile](image-2.png)
+
+## ✨ Features
+- 🐙 **GitHub Analytics** — commits, repos, stars, top languages and contribution stats
+- 💻 **LeetCode Tracker** — problems solved by difficulty, streak, global ranking
+- ✅ **Task Manager** — priority-based task management with filters
+- 🔗 **Public Profile** — shareable developer profile URL for your resume
+- ⚙️ **Account Settings** — update name, connected accounts and password
+- 🌓 **Dark/Light Mode** — persistent theme toggle
+- 📱 **Fully Responsive** — works on all screen sizes
+
+## 🛠 Tech Stack
+
+**Frontend**
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS v4
+- React Context API
+
+**Backend**
+- Node.js + Express.js
+- MongoDB + Mongoose
+- JWT Authentication (HTTP-only cookies)
+
+**External APIs**
+- GitHub REST API
+- LeetCode GraphQL API
+
+**Deployment**
+- Vercel (frontend)
+- Render (backend)
+- MongoDB Atlas (database)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- MongoDB Atlas account
+- GitHub Personal Access Token
+
+### Installation
 
 ```bash
+# Clone the repo
+git clone https://github.com/Omkarbhandia/devboard.git
+cd devboard
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp server/.env.example .env.local
+# Fill in your values in .env.local
+
+# Run frontend (Terminal 1)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Run backend (Terminal 2)
+npm run server
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+GITHUB_TOKEN=your_github_personal_access_token
+NEXT_PUBLIC_API_URL=http://localhost:5001
+NODE_ENV=development
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 Project Structure
 
-## Learn More
+```
+devboard/
+├── app/                        # Next.js pages
+│   ├── dashboard/              # Protected dashboard pages
+│   │   ├── github/             # GitHub stats page
+│   │   ├── leetcode/           # LeetCode stats page
+│   │   ├── tasks/              # Task manager page
+│   │   ├── settings/           # Account settings page
+│   │   └── layout.tsx          # Shared dashboard layout
+│   ├── profile/[username]/     # Public profile page
+│   ├── login/                  # Login page
+│   ├── register/               # Register page
+│   └── context/                # React Context (auth)
+├── server/                     # Express backend
+│   ├── routes/                 # API routes
+│   ├── models/                 # MongoDB models
+│   └── middleware/             # Auth middleware
+└── public/                     # Static assets
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🔒 Security
+- Passwords hashed with bcryptjs
+- JWT stored in HTTP-only cookies
+- CORS configured for production
+- Input validation on all routes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+MIT
