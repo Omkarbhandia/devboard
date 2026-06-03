@@ -21,7 +21,7 @@ app.use(cors({
   origin: [
     'http://localhost:3002',
     'http://localhost:3000',
-    'https://mydevboard.vercel.app/'
+    'https://mydevboard.vercel.app'
 ], credentials: true }))
 app.use(express.json())
 app.use(cookieParser())
