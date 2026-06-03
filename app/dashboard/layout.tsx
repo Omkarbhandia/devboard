@@ -1,39 +1,39 @@
-'use client'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useAuth } from '../context/AuthContent'
-import { useRouter, usePathname } from 'next/navigation'
-import { useTheme } from 'next-themes'
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "../context/AuthContent";
+import { useRouter, usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const { user, logout } = useAuth()
-  const router = useRouter()
-  const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const handleLogout = async () => {
-    await logout()
-    router.push('/login')
-  }
+    await logout();
+    router.push("/login");
+  };
 
   const navItems = [
-    { href: '/dashboard', icon: '🏠', label: 'Overview' },
-    { href: '/dashboard/github', icon: '🐙', label: 'GitHub' },
-    { href: '/dashboard/leetcode', icon: '💻', label: 'LeetCode' },
-    { href: '/dashboard/tasks', icon: '✅', label: 'Tasks' },
-    { href: '/dashboard/settings', icon: '⚙️', label: 'Settings' },
-  ]
+    { href: "/dashboard", icon: "🏠", label: "Overview" },
+    { href: "/dashboard/github", icon: "🐙", label: "GitHub" },
+    { href: "/dashboard/leetcode", icon: "💻", label: "LeetCode" },
+    { href: "/dashboard/tasks", icon: "✅", label: "Tasks" },
+    { href: "/dashboard/settings", icon: "⚙️", label: "Settings" },
+  ];
 
   return (
     <div
@@ -142,16 +142,18 @@ export default function DashboardLayout({
       >
         <div className="flex items-center justify-between mb-6">
           {!collapsed && (
-            <h1 className="text-lg font-bold font-mono">
+            <h1 className="text-xl font-bold font-mono">
               <span className="text-blue-400">▶</span> DevBoard
               <span className="animate-pulse text-blue-400">_</span>
             </h1>
           )}
-          <div className="flex items-center gap-1 ml-auto">
+          <div
+            className={`flex items-center gap-1 ${collapsed ? "flex-col w-full" : "ml-auto"}`}
+          >
             {mounted && (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 rounded-lg text-sm transition-colors"
+                className="p-2 rounded-lg text-sm transition-colors w-full flex justify-center"
                 style={{ color: "var(--text-secondary)" }}
                 title="Toggle theme"
               >
@@ -160,7 +162,7 @@ export default function DashboardLayout({
             )}
             <button
               onClick={() => setCollapsed(!collapsed)}
-              className="p-2 rounded-lg text-sm transition-colors"
+              className="p-2 rounded-lg text-sm transition-colors w-full flex justify-center"
               style={{ color: "var(--text-secondary)" }}
             >
               {collapsed ? "→" : "←"}
