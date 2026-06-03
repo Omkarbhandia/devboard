@@ -1,75 +1,81 @@
-'use client'
-import { useAuth } from '../../context/AuthContent'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { SkeletonCard } from '../../components/Skeleton'
+"use client";
+import { useAuth } from "../../context/AuthContent";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { SkeletonCard } from "../../components/Skeleton";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface LeetCodeData {
   profile: {
-    username: string
-    ranking: number
-    reputation: number
-  }
+    username: string;
+    ranking: number;
+    reputation: number;
+  };
   stats: {
-    total: number
-    easy: number
-    medium: number
-    hard: number
-  }
+    total: number;
+    easy: number;
+    medium: number;
+    hard: number;
+  };
   streak: {
-    current: number
-    totalActiveDays: number
-  }
+    current: number;
+    totalActiveDays: number;
+  };
   recentSubmissions: {
-    title: string
-    slug: string
-    timestamp: string
-    url: string
-  }[]
+    title: string;
+    slug: string;
+    timestamp: string;
+    url: string;
+  }[];
 }
 
 export default function LeetcodePage() {
-  const { user, isAuthenticated, initialLoading } = useAuth()
-  const router = useRouter()
-  const [leetcodeData, setLeetcodeData] = useState<LeetCodeData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { user, isAuthenticated, initialLoading } = useAuth();
+  const router = useRouter();
+  const [leetcodeData, setLeetcodeData] = useState<LeetCodeData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!initialLoading && !isAuthenticated) {
-      router.push('/login')
+      router.push("/login");
     }
-  }, [isAuthenticated, initialLoading])
+  }, [isAuthenticated, initialLoading]);
 
   useEffect(() => {
     if (user?.leetcodeUsername) {
-      fetchLeetcodeData()
+      fetchLeetcodeData();
+    } else {
+      setLoading(false);
     }
-  }, [user])
+  }, [user]);
 
   const fetchLeetcodeData = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await axios.get(
         `${API_URL}/api/leetcode/${user?.leetcodeUsername}`,
-        { withCredentials: true }
-      )
-      setLeetcodeData(res.data)
+        { withCredentials: true },
+      );
+      setLeetcodeData(res.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch LeetCode data')
+      setError(err.response?.data?.message || "Failed to fetch LeetCode data");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (initialLoading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
-    </div>
-  )
+  if (initialLoading)
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "var(--bg-primary)" }}
+      >
+        <p style={{ color: "var(--text-secondary)" }}>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="p-8">
@@ -106,8 +112,27 @@ export default function LeetcodePage() {
       )}
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg mb-6">
-          <p className="text-red-400 text-sm">{error}</p>
+        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg mb-6 flex items-start gap-3">
+          <span className="text-amber-400 text-lg flex-shrink-0">⚠️</span>
+          <div>
+            <p className="text-amber-400 text-sm font-medium">
+              Could not load LeetCode data
+            </p>
+            <p className="text-amber-400/70 text-xs mt-1">
+              Make sure your LeetCode username is correct and your profile is
+              public.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {!loading && !leetcodeData && !error && (
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <p className="text-4xl">💻</p>
+          <p className="font-medium">No LeetCode account connected</p>
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+            Update your profile with your LeetCode username to see your stats
+          </p>
         </div>
       )}
 
