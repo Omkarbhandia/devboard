@@ -23,6 +23,10 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<boolean>
     logout: () => Promise<void>
     clearError: () => void
+    updateProfile: (data: { githubUsername?: string; leetcodeUsername?: string }) => Promise<boolean>
+    updateName: (name: string) => Promise<boolean>
+    changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>
+    deleteAccount: () => Promise<boolean>
 }
 
 
@@ -114,8 +118,70 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
 
     const clearError = () => setError(null)
 
+    const updateProfile = async (data: { githubUsername?: string; leetcodeUsername?: string }): Promise<boolean> => {
+  try {
+    setLoading(true)
+    const res = await axios.patch(`${API_URL}/api/auth/profile`, data, {
+      withCredentials: true,
+    })
+    setUser(res.data)
+    return true
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Update failed')
+    return false
+  } finally {
+    setLoading(false)
+  }
+    }
+    
+    const updateName = async (name: string): Promise<boolean> => {
+  try {
+    setLoading(true)
+    const res = await axios.patch(`${API_URL}/api/auth/name`, { name }, {
+      withCredentials: true,
+    })
+    setUser(res.data)
+    return true
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Update failed')
+    return false
+  } finally {
+    setLoading(false)
+  }
+}
+
+const changePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
+  try {
+    setLoading(true)
+    await axios.patch(`${API_URL}/api/auth/password`, { currentPassword, newPassword }, {
+      withCredentials: true,
+    })
+    return true
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Password update failed')
+    return false
+  } finally {
+    setLoading(false)
+  }
+}
+
+const deleteAccount = async (): Promise<boolean> => {
+  try {
+    setLoading(true)
+    await axios.delete(`${API_URL}/api/auth/account`, { withCredentials: true })
+    setUser(null)
+    setIsAuthenticated(false)
+    return true
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Delete failed')
+    return false
+  } finally {
+    setLoading(false)
+  }
+}
+
     return (
-        <AuthContext.Provider value={{user, isAuthenticated, loading, error, register, login, logout, clearError, initialLoading}}>
+        <AuthContext.Provider value={{user, isAuthenticated, loading, error, register, login, logout, clearError, initialLoading, updateProfile, updateName, changePassword, deleteAccount}}>
             {children}
         </AuthContext.Provider>
     )

@@ -32,6 +32,7 @@ export default function DashboardLayout({
     { href: '/dashboard/github', icon: '🐙', label: 'GitHub' },
     { href: '/dashboard/leetcode', icon: '💻', label: 'LeetCode' },
     { href: '/dashboard/tasks', icon: '✅', label: 'Tasks' },
+    { href: '/dashboard/settings', icon: '⚙️', label: 'Settings' },
   ]
 
   return (
