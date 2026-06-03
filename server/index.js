@@ -17,7 +17,12 @@ const PORT = 5001
 //Connect MongoDb
 connectDB()
 
-app.use(cors({ origin: 'http://localhost:3002', credentials: true }))
+app.use(cors({
+  origin: [
+    'http://localhost:3002',
+    'http://localhost:3000',
+    process.env.FRONTEND_URL
+], credentials: true }))
 app.use(express.json())
 app.use(cookieParser())
 

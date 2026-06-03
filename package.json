@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "server": "nodemon server/index.js",
+    "start:server": "node server/index.js",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.66.0",
