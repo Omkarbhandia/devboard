@@ -1,4 +1,9 @@
-require('@dotenvx/dotenvx').config({ path: '.env.local' })
+// Load .env.local in development; in production (Render), env vars are set via dashboard
+try {
+  require('@dotenvx/dotenvx').config({ path: '.env.local' })
+} catch {
+  console.log('No .env.local found, using system environment variables')
+}
 const express = require('express')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
